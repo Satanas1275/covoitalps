@@ -63,13 +63,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 })
             });
             const result = await res.json();
-            if (res.ok) {
-                alert(result.message || 'Enregistré !');
-                return true;
-            } else {
-                alert(result.error || 'Erreur sauvegarde !');
+            // >>> AJOUT ICI : message custom si présence de l'erreur spécifique du backend
+            if (!res.ok) {
+                if (
+                result.error &&
+                result.error.startsWith("Impossible de changer l'heure")
+                ) {
+                    alert("Ooops ! On dirait que des personnes sont inscrites sur ce créneau ! Vos modifications n'ont donc pas été prises en compte...");
+                } else {
+                    alert(result.error || 'Erreur sauvegarde !');
+                }
                 return false;
             }
+            alert(result.message || 'Enregistré !');
+            return true;
         } catch (e) {
             alert('Erreur réseau sauvegarde');
             return false;

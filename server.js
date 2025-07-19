@@ -48,13 +48,69 @@ app.get('/covoitealps/api/usertrajets', (req, res) => {
 // Sauvegarde/écrase les trajets proposés pour un utilisateur
 app.post('/covoitealps/api/usertrajets/save', (req, res) => {
   const { username, point, trajets } = req.body;
-  console.log("[DEBUG] /usertrajets/save", req.body);
-  if (!username || !point || !trajets) return res.status(400).json({ error: "Champs manquants" });
-  const data = readJSON(usertrajetsFile, {});
-  data[username] = { point, trajets };
-  writeJSON(usertrajetsFile, data);
-  console.log("[DEBUG] usertrajets.json MAJ:", JSON.stringify(data, null, 2));
-  res.json({ message: "Trajets enregistrés" });
+  if (!username || !point || !trajets) {
+    return res.status(400).json({ error: "Données manquantes" });
+  }
+
+  const usertrajetsFile = 'usertrajets.json';
+  const reservationFile = 'reservation.json';
+  const alltraj = readJSON(usertrajetsFile, {});
+  const oldUserTrajets = alltraj[username] ? alltraj[username].trajets : {};
+  const reservations = readJSON(reservationFile, {});
+
+  // BLOQUER si l'utilisateur est déjà passager sur ce créneau (point/date/sens)
+  for (const date of Object.keys(trajets)) {
+    for (const sens of ['aller', 'retour']) {
+      const newT = trajets[date][sens];
+      if (newT) {
+        for (const passager of Object.keys(reservations)) {
+          const resa = reservations[passager][sens];
+          if (
+            resa &&
+            resa.date === date &&
+            resa.conducteur !== username && // tu n'es pas déjà conducteur
+            passager === username // tu es déjà passager sur ce slot
+          ) {
+            return res.status(400).json({ error: `Impossible de devenir conducteur le ${date} (${sens}) : tu es déjà inscrit comme passager sur ce créneau.` });
+          }
+        }
+      }
+    }
+  }
+
+  // BLOQUER si un autre utilisateur est déjà conducteur sur le même point/date/sens
+  for (const user of Object.keys(alltraj)) {
+    if (user === username) continue;
+    const userTrajets = alltraj[user].trajets || {};
+    for (const date of Object.keys(trajets)) {
+      for (const sens of ['aller', 'retour']) {
+        const otherT = userTrajets[date] && userTrajets[date][sens];
+        const newT = trajets[date][sens];
+        if (otherT && newT && alltraj[user].point === point) {
+          // Si déjà conducteur ce jour/sens/point, blocage (option : ajoute check sur l'heure si besoin)
+          return res.status(400).json({ error: `Impossible de devenir conducteur le ${date} (${sens}) : il y a déjà un conducteur sur ce créneau.` });
+        }
+      }
+    }
+  }
+
+  // Vérifie changement d'heure avec passagers existants
+  for (const date of Object.keys(trajets)) {
+    for (const sens of ['aller', 'retour']) {
+      const newT = trajets[date][sens];
+      const oldT = oldUserTrajets && oldUserTrajets[date] ? oldUserTrajets[date][sens] : null;
+      if (newT && oldT && oldT.passagers && oldT.passagers.length > 0) {
+        if (newT.heure !== oldT.heure) {
+          return res.status(400).json({ error: `Impossible de changer l'heure du ${sens} (${date}) : des passagers sont inscrits.` });
+        }
+      }
+    }
+  }
+
+  // Si tout va bien, on enregistre
+  alltraj[username] = { point, trajets };
+  writeJSON(usertrajetsFile, alltraj);
+  res.json({ message: "Trajets enregistrés !" });
 });
 
 // Récupère les points de covoiturage

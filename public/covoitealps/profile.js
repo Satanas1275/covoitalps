@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 alert('Utilisateur créé avec succès.');
-                window.location.href = '/covoitealps/login/login.html';
+                window.location.href = '/covoitealps/profile/login';
             } catch (error) {
                 console.error("Erreur lors de l'inscription:", error);
                 if (error.message.includes('Failed to fetch')) {

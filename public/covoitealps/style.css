@@ -1,20 +1,78 @@
 body {
     background-color: black;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     color: rgb(255, 255, 255);
     margin: 0;
     padding: 0;
 }
 
-.up {
-    align-self: center;
-    text-align: center;
+.main-container {
+    max-width: 600px;
+    margin: 30px auto 70px auto;
+    background: #000000;
+    padding: 24px 18px 24px 18px;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px #0005;
 }
 
-.vostrajet {
+
+
+.trajet-section {
     margin-top: 30px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-bottom: 30px;
+    padding: 16px 10px 10px 10px;
+    background: #292929;
+    border-radius: 10px;
+}
+.trajet-jour {
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #555;
+}
+.trajet-jour:last-child {
+    border-bottom: none;
+}
+.trajet-item {
+    background: #333;
+    border-radius: 7px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.trajet-item > div {
+  margin-bottom: 8px; /* espace entre chaque info */
+}
+.trajet-item > div:last-child {
+  margin-bottom: 0;
+}
+
+#heure, #cond, #place {
+  width: 100%;            /* facultatif, mais utile */
+  text-align: left;       /* force le texte à gauche */
+  align-items: flex-start; /* au cas où tu les avais en flex */
+}
+
+
+
+
+
+.trajet-item button {
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 6px;
+}
+.trajet-item button:hover {
+    background: #2e883a;
 }
 
 .navbar {
@@ -27,30 +85,35 @@ body {
     padding: 10px 0;
 }
 
-/* Ajouter un padding au bas du conteneur principal pour éviter le chevauchement */
-#trajet-list {
-    padding-bottom: 70px; /* Ajuste cette valeur en fonction de la hauteur de ta barre de navigation */
-}
-
 .navbar a {
     color: white;
     text-decoration: none;
 }
 
-.material-icons {
+.material-icons,
+.material-symbols-outlined {
     font-size: 30px;
 }
 
-.tbox {
-    background-color: #333;
-    padding-left: 15px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+.floating-btn {
+    position: fixed;
+    bottom: 86px;
+    right: 18px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px #0005;
+    cursor: pointer;
+    z-index: 50;
+    font-size: 2em;
+    transition: background 0.17s;
 }
-
-.tbox a {
-    color: white;
-    text-decoration: none;
+.floating-btn:hover {
+    background: #4CAF50;
 }

@@ -1,103 +1,147 @@
-body {
-    background-color: black;
-    font-family: Arial, sans-serif;
-    color: rgb(255, 255, 255);
-    margin: 0;
-    padding: 0;
+.calendar-container {
+    max-width: 420px;
+    margin: 30px auto 70px auto;
+    background: #222;
+    padding: 18px 14px;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px #0005;
 }
 
-.vostrajet {
-    margin: 30px 20px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+.field {
+    margin-bottom: 18px;
 }
 
-.tbox {
-    background-color: #333;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-
-.tbox h3 {
-    margin: 0 0 15px 0;
-    color: #fff;
-    font-size: 1.2em;
-}
-
-.checkbox-group {
+#calendar {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.checkbox-group label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.checkbox-group input[type="checkbox"] {
-    margin-right: 8px;
-    accent-color: #4CAF50; /* Couleur des cases cochées */
-    width: 16px;
-    height: 16px;
-}
-
-.time-input {
-    text-align: center;
-}
-
-input[type="time"] {
-    background-color: #444;
-    border: none;
-    padding: 8px;
-    border-radius: 5px;
-    color: white;
-    font-size: 1em;
-    width: 150px;
-}
-
-.navbar {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
     background: #333;
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 20px;
 }
 
-.navbar a {
-    color: white;
-    text-decoration: none;
-}
-
-.material-icons {
-    font-size: 30px;
-}
-
-input[type="time"]:focus {
-    outline: none;
-    background-color: #555;
-}
-
-.save button {
-    margin-left: 20px;
-    margin-right: 20px;
+.day-cell {
+    background: #444;
+    color: #fff;
+    border-radius: 5px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #333;
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.18s;
+    position: relative;
+    font-size: 1em;
+}
+.day-cell.selected, .day-cell.has-trajet {
+    background: #4CAF50;
+    color: #fff;
     font-weight: bold;
-    transition: 0.3s;
+}
+.day-cell.today {
+    outline: 2px solid #fff;
+}
+.day-header {
+    font-weight: bold;
+    background: #222;
+    color: #ffb300;
+    border-radius: 5px;
+    text-align: center;
+    height: 32px;
+    line-height: 32px;
+    font-size: 1em;
+}
+
+#trajet-list {
+    margin-top: 16px;
+    font-size: 1em;
+}
+.trajet-item {
+    background: #333;
+    border-radius: 7px;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.trajet-desc span {
+    margin-right: 15px;
+}
+.trajet-item button {
+    background: #f44336;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 1em;
+}
+.trajet-item button:hover {
+    background: #d32f2f;
+}
+
+.modal {
+    position: fixed;
+    z-index: 99;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+}
+.modal-content {
+    background: #222;
+    padding: 25px 24px 18px 24px;
+    border-radius: 12px;
+    min-width: 290px;
+    max-width: 90vw;
+    color: #fff;
+    position: relative;
+}
+.close {
+    position: absolute;
+    top: 10px; right: 14px;
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+}
+#trajet-form label {
+    margin-right: 10px;
+}
+#trajet-form input[type="time"] {
+    margin-left: 10px;
+    margin-bottom: 7px;
+}
+#trajet-form button {
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.floating-btn {
+    position: fixed;
+    bottom: 86px;
+    right: 18px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px #0005;
+    cursor: pointer;
+    z-index: 50;
+    font-size: 2em;
+    transition: background 0.17s;
+}
+.floating-btn:hover {
+    background: #4CAF50;
 }

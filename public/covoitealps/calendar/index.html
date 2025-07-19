@@ -3,49 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CovoiteAlps</title>
+    <title>CovoiteAlps - Calendrier</title>
     <link rel="stylesheet" href="/covoitealps/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=calendar_month,help,home,location_on,person" rel="stylesheet" />
+    <link rel="stylesheet" href="/covoitealps/calendar/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=calendar_month,help,home,location_on,person,search_hands_free" rel="stylesheet" />
 </head>
 <body>
-    <div class="vostrajet">
-        <div class="tbox">
-            <h3>Aller</h3>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="LA"> Lundi</label>
-                <label><input type="checkbox" id="MA"> Mardi</label>
-                <label><input type="checkbox" id="MeA"> Mercredi</label>
-                <label><input type="checkbox" id="JA"> Jeudi</label>
-                <label><input type="checkbox" id="VA"> Vendredi</label>
-            </div>
-            <div class="time-input">
-                <input type="time" id="TA">
-            </div>
-        </div>
-    
-        <div class="tbox">
-            <h3>Retour</h3>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="LR"> Lundi</label>
-                <label><input type="checkbox" id="MR"> Mardi</label>
-                <label><input type="checkbox" id="MmR"> Mercredi</label>
-                <label><input type="checkbox" id="JR"> Jeudi</label>
-                <label><input type="checkbox" id="VR"> Vendredi</label>
-            </div>
-            <div class="time-input">
-                <input type="time" id="TR">
-            </div>
-        </div>
+    <div class="calendar-container">
+        <h2 id="trajet-header">Mes trajets pour : ...</h2>
+        <div id="calendar"></div>
+        <div id="trajet-list"></div>
         <div class="save">
-            <button id="save-btn">Sauvegarder</button>
+            <button id="save-btn">Sauvegarder tout</button>
         </div>
     </div>
+    <button id="driver-btn" class="floating-btn" title="Page conducteur">
+        <span class="material-symbols-outlined">search_hands_free</span>
+    </button>
     <div class="navbar">
         <a href="/covoitealps/"><span class="material-symbols-outlined">home</span></a>
         <a href="/covoitealps/calendar/"><span class="material-symbols-outlined">calendar_month</span></a>
         <a href="/covoitealps/point/"><span class="material-symbols-outlined">location_on</span></a>
         <a href="/covoitealps/profile"><span class="material-symbols-outlined">person</span></a>
         <a href="/covoitealps/help/"><span class="material-symbols-outlined">help</span></a>
+    </div>
+    <div id="trajet-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h3 id="selected-date-title"></h3>
+            <form id="trajet-form">
+                <label><input type="checkbox" id="aller-check"> ALLER</label>
+                <input type="time" id="aller-time" style="display:none;">
+                <select id="aller-places" style="display:none;">
+                    <option value="1">1 place</option>
+                    <option value="2">2 places</option>
+                    <option value="3">3 places</option>
+                    <option value="4" selected>4 places</option>
+                    <option value="5">5 places</option>
+                    <option value="6">6 places</option>
+                    <option value="7">7 places</option>
+                    <option value="8">8 places</option>
+                </select>
+                <br>
+                <label><input type="checkbox" id="retour-check"> RETOUR</label>
+                <input type="time" id="retour-time" style="display:none;">
+                <select id="retour-places" style="display:none;">
+                    <option value="1">1 place</option>
+                    <option value="2">2 places</option>
+                    <option value="3">3 places</option>
+                    <option value="4" selected>4 places</option>
+                    <option value="5">5 places</option>
+                    <option value="6">6 places</option>
+                    <option value="7">7 places</option>
+                    <option value="8">8 places</option>
+                </select>
+                <div style="margin-top: 1em;">
+                    <button type="submit">Valider</button>
+                </div>
+            </form>
+        </div>
     </div>
     <script src="/covoitealps/calendar/script.js"></script>
 </body>

@@ -4,256 +4,190 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 8102;
 
-// Middleware pour parser les requêtes JSON
 app.use(express.json());
-
-// Servir les fichiers statiques (HTML, CSS, JS) depuis le dossier "public"
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Fonction pour vérifier si une semaine s'est écoulée depuis la dernière synchronisation
-function hasWeekPassed(lastSyncDate) {
-  const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-  const now = new Date();
-  return (now - new Date(lastSyncDate)) >= oneWeekInMs;
+// == Helpers pour lire/écrire JSON fichier ==
+function readJSON(file, def = {}) {
+  if (!fs.existsSync(file)) return def;
+  try {
+    const d = fs.readFileSync(file, 'utf8');
+    return d.trim() ? JSON.parse(d) : def;
+  } catch (e) {
+    console.log(`[DEBUG] Erreur readJSON(${file}):`, e);
+    return def;
+  }
+}
+function writeJSON(file, data) {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
-// Fonction pour lire ou initialiser lastSync.json
-function getLastSyncDate() {
-  const lastSyncFile = path.join(__dirname, 'lastSync.json');
-  if (!fs.existsSync(lastSyncFile)) {
-    const now = new Date().toISOString();
-    fs.writeFileSync(lastSyncFile, JSON.stringify({ lastSync: now }));
-    return now;
-  }
-  const data = fs.readFileSync(lastSyncFile, 'utf8');
-  if (!data.trim()) {
-    const now = new Date().toISOString();
-    fs.writeFileSync(lastSyncFile, JSON.stringify({ lastSync: now }));
-    return now;
-  }
-  return JSON.parse(data).lastSync;
-}
+// == Fichiers ==
+const usertrajetsFile = path.join(__dirname, 'usertrajets.json');
+const reservationFile = path.join(__dirname, 'reservation.json');
+const pointsFile = path.join(__dirname, 'point.json');
 
-// Fonction pour mettre à jour lastSync.json
-function updateLastSyncDate() {
-  const lastSyncFile = path.join(__dirname, 'lastSync.json');
-  const now = new Date().toISOString();
-  fs.writeFileSync(lastSyncFile, JSON.stringify({ lastSync: now }));
-}
+// == Endpoints pour la nouvelle structure ==
 
-// Fonction pour synchroniser trajet.json avec users.json
-function syncTrajetsWithUsers(force = false) {
-  const lastSyncDate = getLastSyncDate();
-  if (!force && !hasWeekPassed(lastSyncDate)) {
-    console.log('Synchronisation non nécessaire.');
-    return;
-  }
-
-  fs.readFile(path.join(__dirname, 'users.json'), 'utf8', (err, userData) => {
-    if (err) {
-      console.error('Erreur lors de la lecture de users.json:', err);
-      return;
-    }
-
-    let users = userData.trim() ? JSON.parse(userData) : [];
-
-    fs.readFile(path.join(__dirname, 'point.json'), 'utf8', (err, pointData) => {
-      if (err) {
-        console.error('Erreur lors de la lecture de point.json:', err);
-        return;
-      }
-
-      let points = pointData.trim() ? JSON.parse(pointData) : [];
-
-      let trajets = {};
-      points.forEach(point => {
-        trajets[point] = {
-          "Lundi": [],
-          "Mardi": [],
-          "Mercredi": [],
-          "Jeudi": [],
-          "Vendredi": []
-        };
-      });
-
-      const usersByPoint = {};
-      users.forEach(user => {
-        if (!usersByPoint[user.point]) usersByPoint[user.point] = [];
-        usersByPoint[user.point].push(user);
-      });
-
-      Object.keys(usersByPoint).forEach(point => {
-        const usersForPoint = usersByPoint[point];
-        const days = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
-        days.forEach(day => {
-          const availableUsers = usersForPoint.filter(user => {
-            const hasAller = user.aller && user.aller.days.includes(day);
-            const hasRetour = user.retour && user.retour.days.includes(day);
-            return hasAller || hasRetour;
-          });
-
-          availableUsers.forEach(user => {
-            const allerTime = user.aller && user.aller.days.includes(day) ? user.aller.time : null;
-            const retourTime = user.retour && user.retour.days.includes(day) ? user.retour.time : null;
-            if (allerTime || retourTime) {
-              trajets[point][day].push({
-                nmb_de_place_restant: 4,
-                conducteur: user.username,
-                aller: allerTime,
-                retour: retourTime,
-                passagers: []
-              });
-            }
-          });
-        });
-      });
-
-      fs.writeFile(path.join(__dirname, 'trajet.json'), JSON.stringify(trajets, null, 2), (err) => {
-        if (err) {
-          console.error('Erreur lors de l\'écriture de trajet.json:', err);
-          return;
-        }
-        updateLastSyncDate();
-        console.log('trajet.json synchronisé avec succès.');
-      });
-    });
-  });
-}
-
-// Endpoint API pour récupérer trajet.json
-app.get('/covoitealps/api/trajets', (req, res) => {
-  const filePath = path.join(__dirname, 'trajet.json');
-  if (!fs.existsSync(filePath)) {
-    console.log('trajet.json n\'existe pas, création d\'un fichier vide.');
-    fs.writeFileSync(filePath, '{}');
-  }
-  fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Erreur lecture trajet.json:', err);
-      return res.status(500).json({ error: 'Erreur serveur lors de la lecture de trajet.json' });
-    }
-    res.json(data.trim() ? JSON.parse(data) : {});
-  });
+// Récupère tous les trajets proposés par tous les utilisateurs
+app.get('/covoitealps/api/usertrajets/all', (req, res) => {
+  const data = readJSON(usertrajetsFile, {});
+  console.log("[DEBUG] /usertrajets/all -->", JSON.stringify(data, null, 2));
+  res.json(data);
 });
 
-// Endpoint API pour récupérer point.json
+// Récupère les trajets proposés par un utilisateur
+app.get('/covoitealps/api/usertrajets', (req, res) => {
+  const { username } = req.query;
+  const data = readJSON(usertrajetsFile, {});
+  console.log(`[DEBUG] /usertrajets?username=${username} -->`, data[username]);
+  if (!username || !data[username]) return res.json({});
+  res.json(data[username].trajets);
+});
+
+// Sauvegarde/écrase les trajets proposés pour un utilisateur
+app.post('/covoitealps/api/usertrajets/save', (req, res) => {
+  const { username, point, trajets } = req.body;
+  console.log("[DEBUG] /usertrajets/save", req.body);
+  if (!username || !point || !trajets) return res.status(400).json({ error: "Champs manquants" });
+  const data = readJSON(usertrajetsFile, {});
+  data[username] = { point, trajets };
+  writeJSON(usertrajetsFile, data);
+  console.log("[DEBUG] usertrajets.json MAJ:", JSON.stringify(data, null, 2));
+  res.json({ message: "Trajets enregistrés" });
+});
+
+// Récupère les points de covoiturage
 app.get('/covoitealps/api/points', (req, res) => {
-  fs.readFile(path.join(__dirname, 'point.json'), 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'Erreur lors de la lecture de point.json' });
-    }
-    res.json(data.trim() ? JSON.parse(data) : []);
-  });
+  const pts = readJSON(pointsFile, []);
+  console.log("[DEBUG] /points -->", pts);
+  res.json(pts);
 });
 
-// Endpoint API pour ajouter un nouveau point
+// Ajoute un point de covoiturage
 app.post('/covoitealps/api/points/add', (req, res) => {
-  const newPoint = req.body.point;
-  if (!newPoint || typeof newPoint !== 'string') {
-    return res.status(400).json({ error: 'Le point doit être une chaîne non vide.' });
+  const { point } = req.body;
+  if (!point || typeof point !== "string") return res.status(400).json({ error: "Le point doit être une chaîne non vide." });
+  const points = readJSON(pointsFile, []);
+  if (points.includes(point)) return res.status(400).json({ error: "Ce point existe déjà." });
+  points.push(point);
+  writeJSON(pointsFile, points);
+  console.log("[DEBUG] Nouveau point ajouté:", point, "Liste complète:", points);
+  res.json({ message: `Point ${point} ajouté avec succès.` });
+});
+
+// == Gestion des réservations ==
+
+// Lister les réservations d'un utilisateur
+app.get('/covoitealps/api/reservation/user', (req, res) => {
+  const { username } = req.query;
+  const data = readJSON(reservationFile, {});
+  console.log(`[DEBUG] /reservation/user?username=${username}`, data[username]);
+  res.json(data[username] || { aller: null, retour: null });
+});
+
+// Réserver un trajet (aller OU retour)
+app.post('/covoitealps/api/reservation', (req, res) => {
+  const { username, point, date, sens, conducteur } = req.body;
+  console.log("[DEBUG] Reservation POST:", req.body);
+  if (!username || !point || !date || !sens || !conducteur) {
+    return res.status(400).json({ error: "Champs manquants" });
+  }
+  const alltraj = readJSON(usertrajetsFile, {});
+  const conducteurTrajets = alltraj[conducteur];
+  if (
+    !conducteurTrajets ||
+    conducteurTrajets.point !== point ||
+    !conducteurTrajets.trajets[date] ||
+    !conducteurTrajets.trajets[date][sens]
+  ) {
+    console.log("[DEBUG] Reservation: trajet non trouvé");
+    return res.status(400).json({ error: "Trajet non trouvé" });
   }
 
-  fs.readFile(path.join(__dirname, 'point.json'), 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Erreur lecture point.json' });
-    let points = data.trim() ? JSON.parse(data) : [];
-    if (points.includes(newPoint)) {
-      return res.status(400).json({ error: 'Ce point existe déjà.' });
-    }
-    points.push(newPoint);
+  // Nouveau format attendu : objet avec heure, places, passagers
+  const trajetObj = conducteurTrajets.trajets[date][sens];
+  if (!trajetObj || typeof trajetObj !== 'object' || !trajetObj.heure) {
+    return res.status(400).json({ error: "Trajet mal formé côté conducteur" });
+  }
+  trajetObj.passagers = trajetObj.passagers || [];
+  trajetObj.places = trajetObj.places || 4;
 
-    fs.writeFile(path.join(__dirname, 'point.json'), JSON.stringify(points, null, 2), (err) => {
-      if (err) return res.status(500).json({ error: 'Erreur écriture point.json' });
-
-      fs.readFile(path.join(__dirname, 'trajet.json'), 'utf8', (err, trajetData) => {
-        if (err) return res.status(500).json({ error: 'Erreur lecture trajet.json' });
-        let trajets = trajetData.trim() ? JSON.parse(trajetData) : {};
-        trajets[newPoint] = { "Lundi": [], "Mardi": [], "Mercredi": [], "Jeudi": [], "Vendredi": [] };
-
-        fs.writeFile(path.join(__dirname, 'trajet.json'), JSON.stringify(trajets, null, 2), (err) => {
-          if (err) return res.status(500).json({ error: 'Erreur écriture trajet.json' });
-          syncTrajetsWithUsers();
-          res.json({ message: `Point ${newPoint} ajouté avec succès.` });
-        });
-      });
-    });
-  });
-});
-
-// Endpoint API pour récupérer users.json
-app.get('/covoitealps/api/users', (req, res) => {
-  fs.readFile(path.join(__dirname, 'users.json'), 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Erreur lecture users.json' });
-    res.json(data.trim() ? JSON.parse(data) : []);
-  });
-});
-
-// Endpoint API pour sauvegarder ou mettre à jour un utilisateur
-app.post('/covoitealps/api/users/save', (req, res) => {
-  const userData = req.body;
-  if (!userData.username || !userData.point) {
-    return res.status(400).json({ error: 'Les champs username et point sont requis.' });
+  // Refuser si déjà passager
+  if (trajetObj.passagers.includes(username)) {
+    return res.status(400).json({ error: "Déjà inscrit sur ce trajet" });
+  }
+  // Refuser si complet
+  if (trajetObj.passagers.length >= trajetObj.places) {
+    return res.status(400).json({ error: "Plus de place disponible" });
   }
 
-  fs.readFile(path.join(__dirname, 'users.json'), 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Erreur lecture users.json' });
-    let users = data.trim() ? JSON.parse(data) : [];
-    const userIndex = users.findIndex(user => user.username === userData.username);
-
-    if (userIndex !== -1) {
-      users[userIndex] = userData;
-    } else {
-      users.push(userData);
+  // Empêcher d'être passager si tu es conducteur sur ce trajet/jour/sens
+  if (conducteur === username) {
+    return res.status(400).json({ error: "Tu es déjà conducteur sur ce trajet" });
+  }
+  // Empêcher d'être passager si tu es conducteur sur ce sens ce jour (même sur un autre trajet)
+  for (const user of Object.keys(alltraj)) {
+    const t = alltraj[user];
+    if (t.point === point &&
+        t.trajets[date] &&
+        t.trajets[date][sens] &&
+        user === username) {
+      return res.status(400).json({ error: "Tu es déjà conducteur sur ce créneau" });
     }
-
-    fs.writeFile(path.join(__dirname, 'users.json'), JSON.stringify(users, null, 2), (err) => {
-      if (err) return res.status(500).json({ error: 'Erreur écriture users.json' });
-      syncTrajetsWithUsers();
-      res.json({ message: 'Informations sauvegardées avec succès.' });
-    });
-  });
-});
-
-// Endpoint API pour mettre à jour un trajet (inscription passager)
-app.post('/covoitealps/api/trajets/update', (req, res) => {
-  const { point, jour, conducteur, nmb_de_place_restant, passager } = req.body;
-  if (!point || !jour || !conducteur || nmb_de_place_restant === undefined || !passager) {
-    return res.status(400).json({ error: 'Tous les champs sont requis.' });
   }
 
-  fs.readFile(path.join(__dirname, 'trajet.json'), 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Erreur lecture trajet.json' });
-    let trajets = data.trim() ? JSON.parse(data) : {};
+  // Ajouter le passager
+  trajetObj.passagers.push(username);
+  // Mettre à jour dans usertrajets.json
+  writeJSON(usertrajetsFile, alltraj);
 
-    if (!trajets[point] || !trajets[point][jour]) {
-      return res.status(400).json({ error: 'Trajet non trouvé.' });
-    }
+  // Mettre à jour reservation.json
+  const resa = readJSON(reservationFile, {});
+  if (!resa[username]) resa[username] = { aller: null, retour: null };
+  resa[username][sens] = { date, heure: trajetObj.heure, conducteur };
+  writeJSON(reservationFile, resa);
 
-    const trajetIndex = trajets[point][jour].findIndex(t => t.conducteur === conducteur);
-    if (trajetIndex === -1) {
-      return res.status(400).json({ error: 'Conducteur non trouvé.' });
-    }
-
-    if (!trajets[point][jour][trajetIndex].passagers) {
-      trajets[point][jour][trajetIndex].passagers = [];
-    }
-    if (trajets[point][jour][trajetIndex].passagers.includes(passager)) {
-      return res.status(400).json({ error: 'Passager déjà inscrit.' });
-    }
-
-    trajets[point][jour][trajetIndex].nmb_de_place_restant = nmb_de_place_restant;
-    trajets[point][jour][trajetIndex].passagers.push(passager);
-
-    fs.writeFile(path.join(__dirname, 'trajet.json'), JSON.stringify(trajets, null, 2), (err) => {
-      if (err) return res.status(500).json({ error: 'Erreur écriture trajet.json' });
-      res.json({ message: 'Trajet mis à jour avec succès.' });
-    });
-  });
+  res.json({ message: "Réservé !" });
 });
 
-// Synchronisation au démarrage
-syncTrajetsWithUsers(true);
+// Se désinscrire d'un trajet (aller ou retour)
+app.post('/covoitealps/api/reservation/unsubscribe', (req, res) => {
+  const { username, sens } = req.body;
+  console.log("[DEBUG] Unsubscribe:", req.body);
+  const resa = readJSON(reservationFile, {});
+  if (!resa[username] || !resa[username][sens]) {
+    console.log("[DEBUG] Désinscription: Pas inscrit");
+    return res.status(400).json({ error: "Pas inscrit" });
+  }
 
-// Démarrer le serveur
+  // On enlève le passager aussi de la liste des passagers dans usertrajets.json
+  const alltraj = readJSON(usertrajetsFile, {});
+  const resaItem = resa[username][sens];
+  if (resaItem) {
+    for (const user of Object.keys(alltraj)) {
+      const t = alltraj[user];
+      if (
+        t.point === (resaItem.point || t.point) &&
+        t.trajets[resaItem.date] &&
+        t.trajets[resaItem.date][sens]
+      ) {
+        let trajetObj = t.trajets[resaItem.date][sens];
+        if (typeof trajetObj === "object" && trajetObj.passagers) {
+          trajetObj.passagers = trajetObj.passagers.filter(p => p !== username);
+        }
+      }
+    }
+    writeJSON(usertrajetsFile, alltraj);
+  }
+
+  resa[username][sens] = null;
+  writeJSON(reservationFile, resa);
+  console.log("[DEBUG] reservation.json après désinscription:", JSON.stringify(resa, null, 2));
+  res.json({ message: "Désinscription réussie !" });
+});
+
+// == Static/public & start ==
 app.listen(port, () => {
   console.log(`Serveur démarré à http://localhost:${port}`);
 });

@@ -1,0 +1,43 @@
+.main-container {
+    max-width: 600px;
+    margin: 30px auto 70px auto;
+    background: #222;
+    padding: 24px 18px 24px 18px;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px #0005;
+}
+#conducteur-list {
+    margin-top: 20px;
+}
+.conducteur-jour {
+    background: #333;
+    border-radius: 9px;
+    margin-bottom: 18px;
+    padding: 14px 16px 10px 16px;
+}
+.conducteur-date {
+    font-size: 1.1em;
+    color: #ffb300;
+    margin-bottom: 8px;
+}
+.conducteur-sens {
+    font-weight: bold;
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+.conducteur-passagers {
+    margin: 0 0 8px 20px;
+    padding: 0;
+    list-style-type: disc;
+    color: #fff;
+}
+.conducteur-passagers li {
+    margin-bottom: 2px;
+    font-size: 1em;
+}
+.conducteur-nopass {
+    color: #bbb;
+    margin-left: 12px;
+    margin-bottom: 5px;
+    font-style: italic;
+}

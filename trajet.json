@@ -1,0 +1,138 @@
+{
+  "Grenoble": {
+    "Lundi": [
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "ROCKNITE STUDIO",
+        "aller": "06:00",
+        "retour": null,
+        "passagers": []
+      },
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "undefined",
+        "aller": "06:00",
+        "retour": null,
+        "passagers": []
+      }
+    ],
+    "Mardi": [
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "ROCKNITE STUDIO",
+        "aller": "06:00",
+        "retour": "23:30",
+        "passagers": []
+      },
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "undefined",
+        "aller": "06:00",
+        "retour": "20:00",
+        "passagers": []
+      }
+    ],
+    "Mercredi": [
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "ROCKNITE STUDIO",
+        "aller": null,
+        "retour": "23:30",
+        "passagers": []
+      },
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "undefined",
+        "aller": null,
+        "retour": "20:00",
+        "passagers": []
+      }
+    ],
+    "Jeudi": [
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "undefined",
+        "aller": "06:00",
+        "retour": "20:00",
+        "passagers": []
+      }
+    ],
+    "Vendredi": [
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "ROCKNITE STUDIO",
+        "aller": null,
+        "retour": "23:30",
+        "passagers": []
+      },
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "undefined",
+        "aller": "06:00",
+        "retour": null,
+        "passagers": []
+      }
+    ]
+  },
+  "Lyon": {
+    "Lundi": [],
+    "Mardi": [],
+    "Mercredi": [],
+    "Jeudi": [],
+    "Vendredi": []
+  },
+  "Chambéry": {
+    "Lundi": [],
+    "Mardi": [],
+    "Mercredi": [],
+    "Jeudi": [],
+    "Vendredi": []
+  },
+  "Evian": {
+    "Lundi": [],
+    "Mardi": [],
+    "Mercredi": [],
+    "Jeudi": [],
+    "Vendredi": []
+  },
+  "Dans ton cul": {
+    "Lundi": [
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "ROCKNITE-STUDIO",
+        "aller": "06:00",
+        "retour": null,
+        "passagers": []
+      },
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "Jérémy Riot ",
+        "aller": "05:30",
+        "retour": "16:30",
+        "passagers": []
+      }
+    ],
+    "Mardi": [],
+    "Mercredi": [
+      {
+        "nmb_de_place_restant": 3,
+        "conducteur": "ROCKNITE-STUDIO",
+        "aller": "06:00",
+        "retour": null,
+        "passagers": [
+          "Jérémy Riot "
+        ]
+      }
+    ],
+    "Jeudi": [
+      {
+        "nmb_de_place_restant": 4,
+        "conducteur": "ROCKNITE-STUDIO",
+        "aller": "06:00",
+        "retour": null,
+        "passagers": []
+      }
+    ],
+    "Vendredi": []
+  }
+}

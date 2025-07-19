@@ -1,0 +1,93 @@
+.container {
+    background-color: #333;  /* Fond couleur similaire au header */
+    color: #bbfcfb;  /* Texte en couleur claire pour le contraste */
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    border-radius: 10px;
+    width: 85%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.container h1 {
+    color: #ffffff;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    padding-top: 10px;
+}
+
+.container p {
+    margin: 10px 0;
+}
+
+.container a {
+    color: #bbfcfb;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+
+form {
+    margin-top: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+form input {
+    width: 95%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #333;
+    color: #fff;
+}
+
+form button {
+    background-color: #bbfcfb;
+    color: #2e2d2d;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.bottom-link {
+    color: #bbfcfb;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.bottom-link a {
+    text-decoration: none;
+    color: #bbfcfb;
+}
+
+
+/* Ajout d'un style pour le bouton de déconnexion sur la page protégée */
+#logout-button {
+    background-color: #bbfcfb; /* Couleur similaire aux autres boutons */
+    color: #2e2d2d; /* Texte sombre pour contraster avec le fond clair du bouton */
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    margin-top: 20px; /* Espacement au-dessus du bouton */
+}

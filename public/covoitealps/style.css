@@ -1,0 +1,56 @@
+body {
+    background-color: black;
+    font-family: Arial;
+    color: rgb(255, 255, 255);
+    margin: 0;
+    padding: 0;
+}
+
+.up {
+    align-self: center;
+    text-align: center;
+}
+
+.vostrajet {
+    margin-top: 30px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.navbar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #333;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+}
+
+/* Ajouter un padding au bas du conteneur principal pour éviter le chevauchement */
+#trajet-list {
+    padding-bottom: 70px; /* Ajuste cette valeur en fonction de la hauteur de ta barre de navigation */
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+}
+
+.material-icons {
+    font-size: 30px;
+}
+
+.tbox {
+    background-color: #333;
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.tbox a {
+    color: white;
+    text-decoration: none;
+}

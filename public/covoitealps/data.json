@@ -1,0 +1,43 @@
+{
+    "Grenoble": {
+        "Lundi": [
+            {
+                "conducteur": "Alice",
+                "nmb_de_place_restant": 2
+            }
+        ],
+        "Mardi": [
+            {
+                "conducteur": "Alice",
+                "nmb_de_place_restant": 2
+            }
+        ],
+        "Mercredi": [],
+        "Jeudi": [],
+        "Vendredi": []
+    },
+    "Lyon": {
+        "Lundi": [],
+        "Mardi": [
+            {
+                "conducteur": "Bob",
+                "nmb_de_place_restant": 5
+            }
+        ],
+        "Mercredi": [],
+        "Jeudi": [],
+        "Vendredi": []
+    },
+    "Chambéry": {
+        "Lundi": [],
+        "Mardi": [],
+        "Mercredi": [
+            {
+                "conducteur": "Charlie",
+                "nmb_de_place_restant": 10
+            }
+        ],
+        "Jeudi": [],
+        "Vendredi": []
+    }
+}
